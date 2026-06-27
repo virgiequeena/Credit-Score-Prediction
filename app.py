@@ -7,8 +7,10 @@ model = joblib.load('artifacts/XGBoost_model.pkl')
 le    = joblib.load('artifacts/label_encoder.pkl')
 
 def main():
+    st.set_page_config(initial_sidebar_state="expanded")
     st.title('Credit Score Prediction')
     st.info("This app predicts a customer's credit score (Good, Standard, or Poor) based on their financial profile, account information, and payment behavior.")
+    st.warning("👈 Start by filling in the customer's basic information in the sidebar on the left, then complete the account and payment details below before clicking **Make Prediction**.")
 
     #Sidebar
     with st.sidebar:
@@ -45,7 +47,15 @@ def main():
             amount_invested_monthly = st.number_input('Amount Invested Monthly', 0.0, 2000.0, 100.0, step=10.0)
             monthly_balance = st.number_input('Monthly Balance', 0.0, 2000.0, 300.0, step=10.0)
             payment_of_min_amount = st.selectbox('Payment of Minimum Amount', ['Yes', 'No'])
-            payment_behaviour = st.selectbox('Payment Behaviour', ['Low_spent_Small_value_payments', 'Low_spent_Medium_value_payments', 'Low_spent_Large_value_payments', 'High_spent_Small_value_payments', 'High_spent_Medium_value_payments', 'High_spent_Large_value_payments'])
+            payment_behaviour_map = {
+                "Low spent, Small value payments":"Low_spent_Small_value_payments",
+                "Low spent, Medium value payments":"Low_spent_Medium_value_payments",
+                "Low spent, Large value payments":"Low_spent_Large_value_payments",
+                "High spent, Small value payments":"High_spent_Small_value_payments",
+                "High spent, Medium value payments":"High_spent_Medium_value_payments",
+                "High spent, Large value payments":"High_spent_Large_value_payments"
+            }
+            payment_behaviour_display = st.selectbox('Payment Behaviour', list(payment_behaviour_map.keys()))
 
         submitted = st.form_submit_button('Make Prediction')
 
@@ -75,7 +85,7 @@ def main():
             "Credit_Mix": credit_mix,
             "Occupation": occupation,
             "Payment_of_Min_Amount": payment_of_min_amount,
-            "Payment_Behaviour": payment_behaviour
+            "Payment_Behaviour": payment_behaviour_map[payment_behaviour_display]
         }
 
         result = make_prediction(features)
@@ -85,10 +95,10 @@ def main():
 
         st.subheader("Prediction Results")
         if credit_score == "Good":
-            st.success(f'Credit Score: {credit_score} 🎉')
+            st.success(f'Credit Score: {credit_score}')
             st.markdown("**This customer shows a strong credit profile.**")
         elif credit_score == "Standard":
-            st.info(f'Credit Score: {credit_score}')
+            st.warning(f'Credit Score: {credit_score}')
             st.markdown("**This customer shows an average credit profile.**")
         else:
             st.error(f'Credit Score: {credit_score}')
