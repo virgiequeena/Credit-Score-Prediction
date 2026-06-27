@@ -3,11 +3,12 @@ import joblib
 import numpy as np
 import pandas as pd
 
+st.set_page_config(initial_sidebar_state="expanded")
+
 model = joblib.load('artifacts/XGBoost_model.pkl')
 le    = joblib.load('artifacts/label_encoder.pkl')
 
 def main():
-    st.set_page_config(initial_sidebar_state="expanded")
     st.title('Credit Score Prediction')
     st.info("This app predicts a customer's credit score (Good, Standard, or Poor) based on their financial profile, account information, and payment behavior.")
     st.warning("👈 Start by filling in the customer's basic information in the sidebar on the left, then complete the account and payment details below before clicking **Make Prediction**.")
